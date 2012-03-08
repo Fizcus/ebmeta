@@ -6,15 +6,16 @@ import yaml
 yaml_simple = re.compile("^[0-9\.]+$")
 yaml_newline = re.compile("^", re.MULTILINE)
 def yaml_value(txt, multiline=False):
-    if txt == None: return '~'
-    if len(txt) == 0: return '~'
+    if txt == None: return u'~'
+    print "-- " + repr(txt)
+    if len(txt) == 0: return u'~'
     if type(txt) is list:
-        return '[' +   ', '.join(yaml_value(x) for x in txt)   + ']'
-    if yaml_simple.match(txt): return txt
+        return u'[' +   u', '.join(yaml_value(x.decode("utf-8", 'replace')) for x in txt)   + u']'
+    if yaml_simple.match(txt): return txt.decode("utf-8", 'replace')
     if multiline:
-        return ">\n" + yaml_newline.sub("  ", txt)
+        return u">\n" + yaml_newline.sub(u"  ", txt.decode("utf-8", 'replace'))
     else:
-        return '"' + txt.replace('"', '\\x22') + '"'
+        return u'"' + txt.decode("utf-8", 'replace').replace(u'"', u'\\x22') + u'"'
 
 def opf_to_yaml(opf, template_str):
     # templ = template.get_file_content('metadata.yaml')

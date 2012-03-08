@@ -19,14 +19,14 @@ def pipe(args, input="", shell=False):
 
     log.debug("pipe(): %s", args)
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, shell=shell)
-    return p.communicate(input)[0].strip()
+    return p.communicate(input.encode("utf-8"))[0].strip()
 
 def pipe_with_exitcode(args, input):
     """Run args[0] with arguments args[1:] and return (standard output, exit code)."""
 
     log.debug("pipe(): %s", args)
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    output = p.communicate(input)[0].strip()
+    output = p.communicate(input.encode("utf-8"))[0].strip()
     return (output, p.returncode)
 
 def save_output(args, output_file):
