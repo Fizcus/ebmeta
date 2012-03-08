@@ -81,12 +81,12 @@ def write_changes(ebook, changes):
         ('book-producer', 'book producer'),
         ('isbn',          'isbn'),
         ('language',      'language'),
-        ('pubdate',       'publication date'),
+        ('date',          'publication date'),
         ('publisher',     'publisher'),
         ('series',        'series'),
         ('title',         'title')
     ):
-        if changes.has_key(b): args.append("--{}=\"{}\"".format(a, quote(changes[b])))
+        if changes.has_key(b): args.append(u"--{}=\"{}\"".format(a, quote(changes[b])))
 
     for a, b in (
         ('rating',        'rating'), # rating can't be unset once it's set, from ebook-meta CLI
@@ -96,14 +96,14 @@ def write_changes(ebook, changes):
     ):
         if changes.has_key(b):
             if changes[b]:
-                args.append("--{}=\"{}\"".format(a, quote(changes[b])))
+                args.append(u"--{}=\"{}\"".format(a, quote(changes[b])))
 
     if changes.has_key('description'):
         description = shell.pipe(["pandoc"], changes['description'])
-        args.append(  "--comments=\"{}\"".format(quote(description))  )
+        args.append(  u"--comments=\"{}\"".format(quote(description))  )
 
     if changes.has_key('tags'):
-        args.append(  "--tags=\"{}\"".format(quote(','.join(changes['tags'])))  )
+        args.append(  u"--tags=\"{}\"".format(quote(','.join(changes['tags'])))  )
 
     if len(args) > 2:
         # Run ebook-meta
@@ -112,7 +112,11 @@ def write_changes(ebook, changes):
 
     if ebook.type == 'epub':
         # set uuid only for Epub files
-        if(changes.has_key('uuid')): setUuid(changes['uuid'])
+        if(changes.has_key('uuid')):
+            try:
+                setUuid(changes['uuid'])
+            except:
+                pass
 
 def setUuid(uuid_txt):
     """Write a new uuid to the Epub file."""
@@ -156,7 +160,10 @@ def setUuid(uuid_txt):
 def quote(text):
     """Change " to \\"."""
 
-    return unicode(text).replace('"', '\\"')
+    try:
+        return unicode(text, errors='replace').replace('"', '\\"')
+    except TypeError:
+        return text
 
 def write_changes_pdf(ebook, changes):
     """Write the metadata in the given dictionary into the pdf file."""

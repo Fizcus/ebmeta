@@ -13,7 +13,7 @@ def yaml_value(txt, multiline=False):
         return u'[' +   u', '.join(yaml_value(x.decode("utf-8", 'replace')) for x in txt)   + u']'
     if yaml_simple.match(txt): return txt.decode("utf-8", 'replace')
     if multiline:
-        return u">\n" + yaml_newline.sub(u"  ", txt.decode("utf-8", 'replace'))
+        return u"|\n" + yaml_newline.sub(u"  ", txt.decode("utf-8", 'replace'))
     else:
         return u'"' + txt.decode("utf-8", 'replace').replace(u'"', u'\\x22') + u'"'
 

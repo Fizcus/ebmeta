@@ -34,6 +34,7 @@ def formatDate(txt):
     ))
 
 def htmlToMarkdown(txt):
+    if not txt: return txt
     return shell.pipe(["pandoc", "--no-wrap", "--from", "html", "--to", "markdown"], txt).strip()
 
 class Opf(dict):
