@@ -9,7 +9,7 @@ from ebmeta import template
 
 log = logging.getLogger('opfreader')
 
-months = "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sept,Oct,Nov,Dec".split(',')
+months = u"Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sept,Oct,Nov,Dec".split(',')
 
 def getAttr(soup, attr):
     try:
@@ -27,7 +27,7 @@ def formatDate(txt):
     if not txt: return None
     m = isodate.match(txt)
     if not m: return None
-    return " ".join((
+    return u" ".join((
         m.group(3),
         months[int(m.group(2)) - 1],
         m.group(1)
@@ -43,52 +43,52 @@ class Opf(dict):
             raise ValueError("Not an XML stream.")
 
         soup = BeautifulStoneSoup(txt, convertEntities=BeautifulStoneSoup.ALL_ENTITIES)
-        self['title'] = getStr(soup.find('dc:title'))
-        self['title sort'] = getAttr(soup.find('meta', attrs={'name':'calibre:title_sort'}), 'content')
+        self[u'title'] = getStr(soup.find('dc:title'))
+        self[u'title sort'] = getAttr(soup.find('meta', attrs={'name':'calibre:title_sort'}), 'content')
         authors = (
             soup.findAll('dc:creator', attrs={'opf:role':'aut'}) or
             soup.findAll('dc:creator', attrs={'role':'aut'})
         )
-        self['authors'] = " & ".join([getStr(author) for author in authors])
-        self['author sort'] = None
+        self[u'authors'] = u" & ".join([getStr(author) for author in authors])
+        self[u'author sort'] = None
         if authors:
-            self['author sort'] = (
+            self[u'author sort'] = (
                 getAttr(authors[0], 'opf:file-as') or
                 getAttr(authors[0], 'file-as')
             )
-        self['publication date'] = formatDate( getStr(soup.find('dc:date')) )
-        self['publisher'] = getStr(soup.find('dc:publisher'))
-        self['book producer'] = (
+        self[u'publication date'] = formatDate( getStr(soup.find('dc:date')) )
+        self[u'publisher'] = getStr(soup.find('dc:publisher'))
+        self[u'book producer'] = (
             getStr( soup.find('dc:contributor', attrs={'opf:role':'bkp'}) ) or
             getStr( soup.find('dc:contributor', attrs={'role':'bkp'}) )
         )
-        self['isbn'] = (
+        self[u'isbn'] = (
             getStr( soup.find('dc:identifier', attrs={'opf:scheme':'ISBN'}) ) or
             getStr( soup.find('dc:identifier', attrs={'opf:scheme':'isbn'}) ) or
             getStr( soup.find('dc:identifier', attrs={'scheme':'ISBN'}) ) or
             getStr( soup.find('dc:identifier', attrs={'scheme':'isbn'}) )
         )
-        if not self['isbn']:
+        if not self[u'isbn']:
             for bookid in [getStr(x) for x in soup.findAll('dc:identifier')]:
                 if bookid and ('isbn' in bookid.lower()):
-                    self['isbn'] = bookid.split(':')[-1]
-        self['language'] = getStr(soup.find('dc:language'))
-        self['rating'] = getAttr(soup.find('meta', attrs={'name':'calibre:rating'}), 'content')
-        self['series'] = getAttr(soup.find('meta', attrs={'name':'calibre:series'}), 'content')
-        self['series index']  = getAttr(soup.find('meta', attrs={'name':'calibre:series_index'}), 'content')
-        self['uuid'] = (
+                    self[u'isbn'] = bookid.split(':')[-1]
+        self[u'language'] = getStr(soup.find('dc:language'))
+        self[u'rating'] = getAttr(soup.find('meta', attrs={'name':'calibre:rating'}), 'content')
+        self[u'series'] = getAttr(soup.find('meta', attrs={'name':'calibre:series'}), 'content')
+        self[u'series index']  = getAttr(soup.find('meta', attrs={'name':'calibre:series_index'}), 'content')
+        self[u'uuid'] = (
             getStr(soup.find('dc:identifier', attrs={'opf:scheme':'uuid'})) or
             getStr(soup.find('dc:identifier', attrs={'opf:scheme':'UUID'})) or
             getStr(soup.find('dc:identifier', attrs={'scheme':'uuid'})) or
             getStr(soup.find('dc:identifier', attrs={'scheme':'UUID'}))
         )
         tags = soup.findAll('dc:subject')
-        self['tags'] = []
+        self[u'tags'] = []
         if tags:
-            self['tags'] = [getStr(x) for x in tags]
+            self[u'tags'] = [getStr(x) for x in tags]
             #self['tags'] = ", ".join([getStr(x) for x in tags])
         description = getStr(soup.find('dc:description'))
-        self['description'] = htmlToMarkdown(description)
+        self[u'description'] = htmlToMarkdown(description)
 
     def __unicode__(self):
         txt = []
@@ -100,9 +100,11 @@ class Opf(dict):
             if len(key) > key_width: key_width = len(key)
 
         for key in keys:
-            if key == 'tags': value = ", ".join(self['tags'])
+            if key == 'tags': value = u", ".join(self[u'tags'])
             else: value = self[key]
 
-            txt.append("{}: {}".format(key.ljust(key_width, ' '), value))
+            #print "key: " + key.__class__.__name__ + " : " + key
+            #print "value: " + value.__class__.__name__
+            txt.append(u"{}: {}".format(key.ljust(key_width, u' '), value))
 
-        return "\n".join(txt)
+        return u"\n".join(txt)

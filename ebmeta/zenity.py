@@ -16,7 +16,7 @@ def edit_string(text, prompt=None):
     if prompt: args.extend(['--title', prompt])
     (text, exitcode) = shell.pipe_with_exitcode(args, text)
     if exitcode: raise ZenityCancelled
-    return text
+    return unicode(text)
 
 if __name__ == '__main__':
     try:

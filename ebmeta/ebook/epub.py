@@ -18,9 +18,9 @@ class Epub(Ebook):
         try:
             with ZipFile(self.path, 'r') as zip:
                 try:
-                    self.__content_opf_str = zip.read("content.opf")
+                    self.__content_opf_str = unicode(zip.read("content.opf"), "utf_8", "replace")
                 except KeyError:
-                    self.__content_opf_str = zip.read("OEBPS/content.opf")
+                    self.__content_opf_str = unicode(zip.read("OEBPS/content.opf"), "utf_8", "replace")
             return self.__content_opf_str
         except:
             pass
@@ -28,7 +28,7 @@ class Epub(Ebook):
         # give up and use the ebook-meta to get the metadata
         with tempfile.NamedTemporaryFile() as f:
             shell.pipe(["ebook-meta", "--to-opf=" + f.name, self.path])
-            self.__content_opf_str = f.read()
+            self.__content_opf_str = unicode(f.read(), "utf_8", "replace")
 
         return self.__content_opf_str
 

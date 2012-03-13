@@ -16,7 +16,7 @@ class Mobi(Ebook):
 
         with tempfile.NamedTemporaryFile() as f:
             shell.pipe(["ebook-meta", "--to-opf=" + f.name, self.path])
-            self.__content_opf_str = f.read()
+            self.__content_opf_str = unicode(f.read(), "utf_8", "replace")
 
         return self.__content_opf_str
 

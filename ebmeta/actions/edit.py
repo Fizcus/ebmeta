@@ -27,7 +27,7 @@ def run(new_yaml_text=None):
         result = new_yaml_text
     else:
         try:
-            result = edit_string(yaml_text)
+            result = edit_string(yaml_text, "Edit Ebook Metadata")
         except ZenityCancelled:
             log.debug("Operation was cancelled.")
             return
@@ -73,18 +73,18 @@ def write_changes(ebook, changes):
         if changes[key] == None: changes[key] = ""
 
     args = [
-        "ebook-meta",
-        '"{}"'.format(path)
+        u"ebook-meta",
+        u'"{}"'.format(path)
     ]
     for a, b in (
-        ('authors',       'authors'),
-        ('book-producer', 'book producer'),
-        ('isbn',          'isbn'),
-        ('language',      'language'),
-        ('date',          'publication date'),
-        ('publisher',     'publisher'),
-        ('series',        'series'),
-        ('title',         'title')
+        (u'authors',       'authors'),
+        (u'book-producer', 'book producer'),
+        (u'isbn',          'isbn'),
+        (u'language',      'language'),
+        (u'date',          'publication date'),
+        (u'publisher',     'publisher'),
+        (u'series',        'series'),
+        (u'title',         'title')
     ):
         if changes.has_key(b): args.append(u"--{}=\"{}\"".format(a, quote(changes[b])))
 
@@ -103,12 +103,12 @@ def write_changes(ebook, changes):
         args.append(  u"--comments=\"{}\"".format(quote(description))  )
 
     if changes.has_key('tags'):
-        args.append(  u"--tags=\"{}\"".format(quote(','.join(changes['tags'])))  )
+        args.append(  u"--tags=\"{}\"".format(quote(u','.join(changes['tags'])))  )
 
     if len(args) > 2:
         # Run ebook-meta
         # shell.run(" ".join(args), shell=True)
-        shell.pipe(" ".join(args), shell=True)
+        shell.pipe(u" ".join(args), shell=True)
 
     if ebook.type == 'epub':
         # set uuid only for Epub files
@@ -161,7 +161,7 @@ def quote(text):
     """Change " to \\"."""
 
     try:
-        return unicode(text, errors='replace').replace('"', '\\"')
+        return text.replace('"', '\\"')
     except TypeError:
         return text
 
@@ -174,16 +174,16 @@ def write_changes_pdf(ebook, changes):
         if changes[key] == None: changes[key] = ""
 
     args = [
-        "exiftool",
-        '"{}"'.format(path)
+        u"exiftool",
+        u'"{}"'.format(path)
     ]
     for a, b in (
-        ('Author', 'authors'),
-        ('Title',  'title')
+        (u'Author', 'authors'),
+        (u'Title',  'title')
     ):
-        if changes.has_key(b): args.append("-{}=\"{}\"".format(a, quote(changes[b])))
+        if changes.has_key(b): args.append(u"-{}=\"{}\"".format(a, quote(changes[b])))
 
     if len(args) > 2:
         # Run ebook-meta
         # shell.run(" ".join(args), shell=True)
-        shell.pipe(" ".join(args), shell=True)
+        shell.pipe(u" ".join(args), shell=True)
