@@ -49,9 +49,12 @@ class Opf(dict):
             soup.findAll('dc:creator', attrs={'opf:role':'aut'}) or
             soup.findAll('dc:creator', attrs={'role':'aut'})
         )
-        self[u'authors'] = u" & ".join([getStr(author) for author in authors])
+        self[u'authors'] = None
         self[u'author sort'] = None
-        if authors:
+        print len(authors)
+        print authors[0]
+        if authors and len(authors):
+            self[u'authors'] = u" & ".join([x for x in [getStr(author) for author in authors] if x is not None])
             self[u'author sort'] = (
                 getAttr(authors[0], 'opf:file-as') or
                 getAttr(authors[0], 'file-as')
